@@ -1,62 +1,59 @@
 /*
-Copyright 2022 New Vector Ltd
+Copyright 2022-2024 New Vector Ltd.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+SPDX-License-Identifier: AGPL-3.0-only OR GPL-3.0-only OR LicenseRef-Element-Commercial
+Please see LICENSE files in the repository root for full details.
 */
 
-import BaseEventIndexManager, {
-    ICrawlerCheckpoint,
-    IEventAndProfile,
-    IIndexStats,
-    ISearchArgs,
-} from 'matrix-react-sdk/src/indexing/BaseEventIndexManager';
-import { IMatrixProfile, IEventWithRoomId as IMatrixEvent, IResultRoomEvents } from "matrix-js-sdk/src/@types/search";
+// eslint-disable-next-line no-restricted-imports
+import {
+    type IMatrixProfile,
+    type IEventWithRoomId as IMatrixEvent,
+    type IResultRoomEvents,
+} from "matrix-js-sdk/src/@types/search";
 
+import BaseEventIndexManager, {
+    type ICrawlerCheckpoint,
+    type IEventAndProfile,
+    type IIndexStats,
+    type ISearchArgs,
+    type ILoadArgs,
+} from "../../indexing/BaseEventIndexManager";
 import { IPCManager } from "./IPCManager";
 
 export class SeshatIndexManager extends BaseEventIndexManager {
     private readonly ipc = new IPCManager("seshat", "seshatReply");
 
     public async supportsEventIndexing(): Promise<boolean> {
-        return this.ipc.call('supportsEventIndexing');
+        return this.ipc.call("supportsEventIndexing");
     }
 
     public async initEventIndex(userId: string, deviceId: string): Promise<void> {
-        return this.ipc.call('initEventIndex', userId, deviceId);
+        return this.ipc.call("initEventIndex", userId, deviceId);
     }
 
     public async addEventToIndex(ev: IMatrixEvent, profile: IMatrixProfile): Promise<void> {
-        return this.ipc.call('addEventToIndex', ev, profile);
+        return this.ipc.call("addEventToIndex", ev, profile);
     }
 
     public async deleteEvent(eventId: string): Promise<boolean> {
-        return this.ipc.call('deleteEvent', eventId);
+        return this.ipc.call("deleteEvent", eventId);
     }
 
     public async isEventIndexEmpty(): Promise<boolean> {
-        return this.ipc.call('isEventIndexEmpty');
+        return this.ipc.call("isEventIndexEmpty");
     }
 
     public async isRoomIndexed(roomId: string): Promise<boolean> {
-        return this.ipc.call('isRoomIndexed', roomId);
+        return this.ipc.call("isRoomIndexed", roomId);
     }
 
     public async commitLiveEvents(): Promise<void> {
-        return this.ipc.call('commitLiveEvents');
+        return this.ipc.call("commitLiveEvents");
     }
 
     public async searchEventIndex(searchConfig: ISearchArgs): Promise<IResultRoomEvents> {
-        return this.ipc.call('searchEventIndex', searchConfig);
+        return this.ipc.call("searchEventIndex", searchConfig);
     }
 
     public async addHistoricEvents(
@@ -64,42 +61,42 @@ export class SeshatIndexManager extends BaseEventIndexManager {
         checkpoint: ICrawlerCheckpoint | null,
         oldCheckpoint: ICrawlerCheckpoint | null,
     ): Promise<boolean> {
-        return this.ipc.call('addHistoricEvents', events, checkpoint, oldCheckpoint);
+        return this.ipc.call("addHistoricEvents", events, checkpoint, oldCheckpoint);
     }
 
     public async addCrawlerCheckpoint(checkpoint: ICrawlerCheckpoint): Promise<void> {
-        return this.ipc.call('addCrawlerCheckpoint', checkpoint);
+        return this.ipc.call("addCrawlerCheckpoint", checkpoint);
     }
 
     public async removeCrawlerCheckpoint(checkpoint: ICrawlerCheckpoint): Promise<void> {
-        return this.ipc.call('removeCrawlerCheckpoint', checkpoint);
+        return this.ipc.call("removeCrawlerCheckpoint", checkpoint);
     }
 
-    public async loadFileEvents(args): Promise<IEventAndProfile[]> {
-        return this.ipc.call('loadFileEvents', args);
+    public async loadFileEvents(args: ILoadArgs): Promise<IEventAndProfile[]> {
+        return this.ipc.call("loadFileEvents", args);
     }
 
     public async loadCheckpoints(): Promise<ICrawlerCheckpoint[]> {
-        return this.ipc.call('loadCheckpoints');
+        return this.ipc.call("loadCheckpoints");
     }
 
     public async closeEventIndex(): Promise<void> {
-        return this.ipc.call('closeEventIndex');
+        return this.ipc.call("closeEventIndex");
     }
 
     public async getStats(): Promise<IIndexStats> {
-        return this.ipc.call('getStats');
+        return this.ipc.call("getStats");
     }
 
     public async getUserVersion(): Promise<number> {
-        return this.ipc.call('getUserVersion');
+        return this.ipc.call("getUserVersion");
     }
 
     public async setUserVersion(version: number): Promise<void> {
-        return this.ipc.call('setUserVersion', version);
+        return this.ipc.call("setUserVersion", version);
     }
 
     public async deleteEventIndex(): Promise<void> {
-        return this.ipc.call('deleteEventIndex');
+        return this.ipc.call("deleteEventIndex");
     }
 }

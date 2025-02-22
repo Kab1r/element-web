@@ -1,25 +1,14 @@
 /*
-Copyright 2022 New Vector Ltd
+Copyright 2022-2024 New Vector Ltd.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+SPDX-License-Identifier: AGPL-3.0-only OR GPL-3.0-only OR LicenseRef-Element-Commercial
+Please see LICENSE files in the repository root for full details.
 */
 
-import { defer, IDeferred } from 'matrix-js-sdk/src/utils';
+import { defer, type IDeferred } from "matrix-js-sdk/src/utils";
 import { logger } from "matrix-js-sdk/src/logger";
 
-import { ElectronChannel } from "../../@types/global";
-
-const electron = window.electron;
+import { type ElectronChannel } from "../../@types/global";
 
 interface IPCPayload {
     id?: number;
@@ -35,7 +24,10 @@ export class IPCManager {
         private readonly sendChannel: ElectronChannel = "ipcCall",
         private readonly recvChannel: ElectronChannel = "ipcReply",
     ) {
-        electron.on(this.recvChannel, this.onIpcReply);
+        if (!window.electron) {
+            throw new Error("Cannot instantiate ElectronPlatform, window.electron is not set");
+        }
+        window.electron.on(this.recvChannel, this.onIpcReply);
     }
 
     public async call(name: string, ...args: any[]): Promise<any> {
@@ -44,11 +36,11 @@ export class IPCManager {
         const deferred = defer<any>();
         this.pendingIpcCalls[ipcCallId] = deferred;
         // Maybe add a timeout to these? Probably not necessary.
-        window.electron.send(this.sendChannel, { id: ipcCallId, name, args });
+        window.electron!.send(this.sendChannel, { id: ipcCallId, name, args });
         return deferred.promise;
     }
 
-    private onIpcReply = (ev: {}, payload: IPCPayload): void => {
+    private onIpcReply = (_ev: Event, payload: IPCPayload): void => {
         if (payload.id === undefined) {
             logger.warn("Ignoring IPC reply with no ID");
             return;
